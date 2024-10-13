@@ -37,18 +37,19 @@ class LoadBalanceEnv(core.Env):
         time 5. Then the reward is - (1 * 1 + 1 * 2.4 + 2 * 5).
         Thus, the sum of the rewards would be negative of total
         (waiting + processing) time for all jobs.
-    
+
     * REFERENCE *
         Figure 1a, Section 6.2 and Appendix J
-        Variance Reduction for Reinforcement Learning in Input-Driven Environments. 
+        Variance Reduction for Reinforcement Learning in Input-Driven Environments.
         H Mao, SB Venkatakrishnan, M Schwarzkopf, M Alizadeh.
         https://openreview.net/forum?id=Hyg1G2AqtQ
-    
+
         Certain optimality properties of the first-come first-served discipline for g/g/s queues.
         DJ Daley.
         Stochastic Processes and their Applications, 25:301–308, 1987.
     """
-    def __init__(self, job_distribution='pareto'):
+
+    def __init__(self, job_distribution="Pareto"):
         # observation and action space
         self.setup_space()
         # random seed
@@ -67,7 +68,9 @@ class LoadBalanceEnv(core.Env):
         self.finished_jobs = []
         # job distribution # New
         self.generate_job_fn = lambda x: generate_job(x, job_distribution)
-        self.generate_jobs_fn = lambda tup: generate_jobs(tup[0], tup[1], job_distribution)
+        self.generate_jobs_fn = lambda tup: generate_jobs(
+            tup[0], tup[1], job_distribution
+        )
         # reset environment (generate new jobs)
         self.reset()
 
@@ -112,9 +115,16 @@ class LoadBalanceEnv(core.Env):
             # if the load is larger than observation threshold
             # report a warning
             if load > self.obs_high[server.server_id]:
-                logger.warn('Server ' + str(server.server_id) + ' at time ' +
-                             str(self.wall_time.curr_time) + ' has load ' + str(load) +
-                             ' larger than obs_high ' + str(self.obs_high[server.server_id]))
+                logger.warn(
+                    "Server "
+                    + str(server.server_id)
+                    + " at time "
+                    + str(self.wall_time.curr_time)
+                    + " has load "
+                    + str(load)
+                    + " larger than obs_high "
+                    + str(self.obs_high[server.server_id])
+                )
                 load = self.obs_high[server.server_id]
             obs_arr.append(load)
 
@@ -123,9 +133,14 @@ class LoadBalanceEnv(core.Env):
             obs_arr.append(0)
         else:
             if self.incoming_job.size > self.obs_high[-2]:
-                logger.warn('Incoming job at time ' + str(self.wall_time.curr_time) +
-                              ' has size ' + str(self.incoming_job.size) +
-                              ' larger than obs_high ' + str(self.obs_high[-2]))
+                logger.warn(
+                    "Incoming job at time "
+                    + str(self.wall_time.curr_time)
+                    + " has size "
+                    + str(self.incoming_job.size)
+                    + " larger than obs_high "
+                    + str(self.obs_high[-2])
+                )
                 obs_arr.append(self.obs_high[-2])
             else:
                 obs_arr.append(self.incoming_job.size)
@@ -159,9 +174,12 @@ class LoadBalanceEnv(core.Env):
         # a warning message will show up every time e.g., the observation falls
         # out of the observation space
         self.obs_low = np.array([0] * (config.num_servers + 2))
-        self.obs_high = np.array([config.load_balance_obs_high] * (config.num_servers + 1) + [10e8])
+        self.obs_high = np.array(
+            [config.load_balance_obs_high] * (config.num_servers + 1) + [10e8]
+        )
         self.observation_space = spaces.Box(
-            low=self.obs_low, high=self.obs_high, dtype=np.float32)
+            low=self.obs_low, high=self.obs_high, dtype=np.float32
+        )
         self.action_space = spaces.Discrete(config.num_servers)
 
     def step(self, action):
@@ -192,8 +210,9 @@ class LoadBalanceEnv(core.Env):
             num_active_jobs = sum(len(w.queue) for w in self.servers)
             for server in self.servers:
                 if server.curr_job is not None:
-                    assert server.curr_job.finish_time >= \
-                           self.wall_time.curr_time  # curr job should be valid
+                    assert (
+                        server.curr_job.finish_time >= self.wall_time.curr_time
+                    )  # curr job should be valid
                     num_active_jobs += 1
             reward -= (new_time - self.wall_time.curr_time) * num_active_jobs
 
@@ -214,7 +233,7 @@ class LoadBalanceEnv(core.Env):
                     # don't store infinite streaming
                     # TODO: stream the complete job to some file
                     if len(self.finished_jobs) > 0:
-                        self.finished_jobs[-1] +=1
+                        self.finished_jobs[-1] += 1
                     else:
                         self.finished_jobs = [1]
                 if job.server.curr_job == job:
@@ -228,40 +247,46 @@ class LoadBalanceEnv(core.Env):
                 print("illegal event type")
                 exit(1)
 
-        done = ((len(self.timeline) == 0) and \
-               self.incoming_job is None)
+        done = (len(self.timeline) == 0) and self.incoming_job is None
 
-        return self.observe(), reward, done, {'curr_time': self.wall_time.curr_time}
+        return self.observe(), reward, done, {"curr_time": self.wall_time.curr_time}
 
 
 class LoadBalanceEnvPareto(LoadBalanceEnv):
     def __init__(self):
-        super().__init__(job_distribution='Pareto')
+        super().__init__(job_distribution="Pareto")
+
 
 class LoadBalanceEnvSaw(LoadBalanceEnv):
     def __init__(self):
-        super().__init__(job_distribution='Saw')
+        super().__init__(job_distribution="Saw")
+
 
 class LoadBalanceEnvUniform(LoadBalanceEnv):
     def __init__(self):
-        super().__init__(job_distribution='Uniform')
+        super().__init__(job_distribution="Uniform")
+
 
 class LoadBalanceEnvDriftPos(LoadBalanceEnv):
     def __init__(self):
-        super().__init__(job_distribution='DriftPos')
+        super().__init__(job_distribution="DriftPos")
+
 
 class LoadBalanceEnvDriftNeg(LoadBalanceEnv):
     def __init__(self):
-        super().__init__(job_distribution='DriftNeg')
+        super().__init__(job_distribution="DriftNeg")
+
 
 class LoadBalanceEnvCyclicPos(LoadBalanceEnv):
     def __init__(self):
-        super().__init__(job_distribution='CyclicPos')
+        super().__init__(job_distribution="CyclicPos")
+
 
 class LoadBalanceEnvCyclicNeg(LoadBalanceEnv):
     def __init__(self):
-        super().__init__(job_distribution='CyclicNeg')
+        super().__init__(job_distribution="CyclicNeg")
+
 
 class LoadBalanceEnvConstant(LoadBalanceEnv):
     def __init__(self):
-        super().__init__(job_distribution='Constant')
+        super().__init__(job_distribution="Constant")
