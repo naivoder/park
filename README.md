@@ -14,6 +14,10 @@ Currently broken envs:
 
 - Cache
 - Circuit
+- Multi-dim Index
+- Region Assignment
+- Spark
+- TF Placement
 
 ### Real system interface
 
