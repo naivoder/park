@@ -11,8 +11,7 @@ class Params:
     STEPS_PER_EPOCH = 10
 
     # Options are 'full' or 'sampled'
-    # DATASET_TYPE = 'full'
-    DATASET_TYPE = "sampled"
+    DATASET_TYPE = "full"
 
     #### Parameters you should NOT change ####
 
@@ -20,7 +19,7 @@ class Params:
     NDIMS = 6
     print(park.__path__[0])
     # The name of the datafile. If not present on the machine, it will be downloaded.
-    # assert DATASET_TYPE in ["full"]
+    assert DATASET_TYPE in ["full"]
     DATASET_PATH = (
         park.__path__[0]
         + "/envs/multi_dim_index/data/osm_dataset_%s.bin" % DATASET_TYPE
