@@ -1,11 +1,17 @@
 # Park
 
 ### Setup
+
 ```bash
 pip install -e .
 ```
 
+- Install apt dependencies
+- Install rust
+- Build "congestion control" package
+
 ### Real system interface
+
 ```python
 import park
 import agent_impl  # implemented by user
@@ -19,6 +25,7 @@ env.run(agent)
 ```
 
 The `agent_impl.py` should implement
+
 ```python
 class Agent(object):
     def __init__(self, state_space, action_space, *args, **kwargs):
@@ -32,7 +39,9 @@ class Agent(object):
 ```
 
 ### Simulation interface
+
 Similar to OpenAI Gym interface.
+
 ```python
 import park
 
@@ -65,7 +74,9 @@ while not done:
 | Switch scheduling               |switch_scheduling                  | Ravichandra Addanki, Hongzi Mao |
 
 ### Misc
+
 Note: to use `argparse` that is compatiable with park parameters, add parameters using
+
 ```python
 from park.param import parser
 parser.add_argument('--new_parameter')
