@@ -10,6 +10,11 @@ pip install -e .
 - Install rust
 - Build "congestion control" package
 
+Currently broken envs:
+
+- Cache
+- Circuit
+
 ### Real system interface
 
 ```python
